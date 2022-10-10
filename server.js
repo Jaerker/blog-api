@@ -8,7 +8,7 @@ const authRoute = require('./routes/auth');
 const blogRoute = require('./routes/blog');
 
 
-const PORT = 3030 || process.env.PORT;
+const PORT = process.env.PORT;
 
 
 //Connect to db
