@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 router.post('/register', async (req, res)=>{
 
 
-
+    res.header('Access-Control-Allow-Origin', 'https://blog-app-production-a708.up.railway.app/');
     //Validating data
     const {error} = registerValidation(req.body)
     if(error){ return res.status(400).send(error.message)}
@@ -39,6 +39,8 @@ router.post('/register', async (req, res)=>{
 
 router.post('/login', async (req, res)=>{
     
+
+    res.header('Access-Control-Allow-Origin', 'https://blog-app-production-a708.up.railway.app/');
 
     //Validating data
     const {error} = loginValidation(req.body)
