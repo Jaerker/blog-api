@@ -126,7 +126,6 @@ router.route('/posts/:postId/:commentId')
 
 router.route('/users')
 
-res.header("Access-Control-Allow-Origin", "*") //remove when website is public
 
 .get(verify, async (req, res)=>{
     const users = await User.find({}, {__v: 0, password: 0});
