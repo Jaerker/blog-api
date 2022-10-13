@@ -9,7 +9,7 @@ const User = require('../model/User');
 router.route('/posts')
 .get( verify,  async (req, res)=>{
 
-
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
     const posts = await Post.find();
 
     if(posts) return res.status(200).send(posts);
@@ -21,7 +21,7 @@ router.route('/posts')
 
 .post(verify, (req,res)=>{
 
-
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
     const post = new Post({
         title: req.body.title,
         content: req.body.content,
@@ -36,6 +36,9 @@ router.route('/posts')
 router.route('/posts/:postId')
 
 .get(verify, (req, res) =>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
     Post.findById(req.params.postId, (err, success)=>{
         if(err) res.status(400).send(err);
         else res.status(200).send(success);
@@ -44,6 +47,9 @@ router.route('/posts/:postId')
 
 //Posts comment for specific post.
 .post(verify, async (req, res)=>{
+    
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
     const Comment = new mongoose.model("comment", commentSchema);
     const comment = new Comment({
         reaction: req.body.reaction,
@@ -64,6 +70,8 @@ router.route('/posts/:postId')
 
 //Deletes the post itself with all the comments
 .delete(verify, (req, res)=>{
+
+
     Post.findOneAndDelete({_id: req.params.postId}, err =>{
         if(err) return res.status(400).send(err);
         else return res.status(200).send("Successfully deleted post");
@@ -74,6 +82,8 @@ router.route('/posts/:postId')
 
 router.route('/posts/:postId/:commentId')
 .get(verify, async (req, res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
 
     try
     {
@@ -95,6 +105,8 @@ router.route('/posts/:postId/:commentId')
 })
 
 .delete(verify, async (req,res) =>{
+
+
     try
     {
         const post = await Post.findOne({_id: req.params.postId});
@@ -113,6 +125,9 @@ router.route('/posts/:postId/:commentId')
 });
 
 router.route('/users')
+
+res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
 .get(verify, async (req, res)=>{
     const users = await User.find({}, {__v: 0, password: 0});
     
@@ -122,6 +137,9 @@ router.route('/users')
 
 router.route('/users/:userId')
 .get(verify, async (req, res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
     const user = await User.findOne({_id: req.params.userId}, {__v: 0, password: 0});
 
     if(user){
@@ -134,6 +152,9 @@ router.route('/users/:userId')
 })
 
 .put(verify, (req, res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
     const user = new User({
         fName: req.body.fName,
         lName: req.body.lName,
@@ -147,6 +168,8 @@ router.route('/users/:userId')
 })
 
 .delete(verify, (req,res)=>{
+
+
     User.findOneAndDelete({_id: req.user._id}, (err)=>{
         if(err) return res.status(400).send("Could not delete User");
         else {
@@ -158,11 +181,16 @@ router.route('/users/:userId')
 
 router.route('/users/:userId/posts')
 .get(verify, async (req,res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
     const posts = await Post.find({author: req.params.userId});
 
     res.send(posts);
 })
 .delete(verify, async (req,res)=>{
+
+
     const posts = await Post.find({author: req.params.userId}).deleteMany();
     res.send(posts);
     
@@ -172,6 +200,8 @@ router.route('/users/:userId/posts')
 router.route('/users/:userId/friends')
 
 .get(verify, async (req,res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
 
     const user = await User.findOne({_id: req.params.userId}).populate('friends').exec();
 
@@ -184,6 +214,8 @@ router.route('/users/:userId/friends')
 })
 
 .post(verify, async (req, res)=>{
+
+    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
 
     const friendUser = await User.findById(req.params.userId);
 
