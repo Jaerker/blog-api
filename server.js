@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
 const app = express();
-
+const cors = require('cors');
 //Import routes
 const authRoute = require('./routes/auth');
 const blogRoute = require('./routes/blog');
@@ -20,7 +20,9 @@ mongoose.connect(process.env.DB_URL,
 
 //Middlewares
 app.use(express.json());
-
+app.use(cors({
+    origin: 'https://blog-app-production-a708.up.railway.app'
+}));
 
 
 
