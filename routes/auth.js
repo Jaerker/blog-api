@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 router.post('/register', async (req, res)=>{
 
-    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
+
 
     //Validating data
     const {error} = registerValidation(req.body)
@@ -39,9 +39,7 @@ router.post('/register', async (req, res)=>{
 
 router.post('/login', async (req, res)=>{
     
-    res.header("Access-Control-Allow-Origin", "*") //remove when website is public
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,Content-Type, Accept");
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+
     //Validating data
     const {error} = loginValidation(req.body)
     if(error){ return res.status(400).send(error.message)}
