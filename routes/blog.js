@@ -112,6 +112,18 @@ router.route('/posts/:postId/:commentId')
     }
 });
 
+//Get user info
+router.route('/user')
+.get(verify, async (req,res) =>{
+    const user = await User.findOne({_id: req.user._id}, {__v:0, password:0, posts:0});
+
+    await user.populate('friends', {password:0, posts:0, friends:0, __v:0} );
+
+    res.status(200).send(user);
+    
+});
+
+
 router.route('/users')
 .get(verify, async (req, res)=>{
     const users = await User.find({}, {__v: 0, password: 0});
