@@ -35,9 +35,12 @@ const userSchema = new mongoose.Schema({
     friends : [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
-    
+    }],
 
+    verified: {
+        type: Boolean,
+        default: false
+    }
     
 
 
