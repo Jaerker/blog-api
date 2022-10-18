@@ -11,6 +11,34 @@ const User = require('../model/User');
 const Token = require('../model/TokenSchema');
 
 
+router.post('/login', async (req, res) => {
+
+
+
+    //Validating data
+    const { error } = loginValidation(req.body)
+    if (error) { return res.status(400).send(error.message) }
+
+    //Checking if user is already registered
+    const user = await (User.findOne({ email: req.body.email.toLowerCase() }));
+    if (!user) return res.status(400).send('Email not found.');
+
+    if (!user.verified) return res.status(400).send('Account is not verified, please request new validation mail.');
+
+    //Password is correct
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) return res.status(400).send('password is wrong.');
+
+
+
+    //Create and assign token
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+
+
+    res.header('auth-token', token).send({ token, 'fName': user.fName });
+
+
+});
 
 router.post('/verify', async (req, res) => {
     try {
@@ -27,7 +55,7 @@ router.post('/verify', async (req, res) => {
             user = await new User({
                 fName: req.body.fName,
                 lName: req.body.lName,
-                email: req.body.email,
+                email: req.body.email.toLowerCase(),
                 password: hashPassword
             }).save();
 
@@ -101,33 +129,6 @@ router.get('/verify/:id/:token', async (req, res) => {
 
 
 
-router.post('/login', async (req, res) => {
 
-
-
-    //Validating data
-    const { error } = loginValidation(req.body)
-    if (error) { return res.status(400).send(error.message) }
-
-    //Checking if user is already registered
-    const user = await (User.findOne({ email: req.body.email }));
-    if (!user) return res.status(400).send('Email not found.');
-
-    if (!user.verified) return res.status(400).send('Account is not verified, please request new validation mail.');
-
-    //Password is correct
-    const validPass = await bcrypt.compare(req.body.password, user.password);
-    if (!validPass) return res.status(400).send('password is wrong.');
-
-
-
-    //Create and assign token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-
-
-    res.header('auth-token', token).send({ token, 'fName': user.fName });
-
-
-});
 
 module.exports = router;
