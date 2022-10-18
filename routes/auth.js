@@ -31,35 +31,41 @@ router.post('/verify', async (req, res) => {
                 password: hashPassword
             }).save();
 
-            token = await new Token({
-                userId: user._id,
-                token: crypto.randomBytes(32).toString('hex')
-            }).save();
+        }
+        else {
+            const validPass = await bcrypt.compare(req.body.password, user.password);
+            if (!validPass) return res.status(400).send('We are waiting for user to verify their account, the mail has been sent!');
         }
 
         if (user.verified === true) return res.status(400).send('Email is already registered on this site.');
 
-        else{
-            token = await Token.findOne({userId: user._id});
-        }
+
+
+        await Token.findOneAndRemove({ userId: user._id });
+
+        token = await new Token({
+            userId: user._id,
+            token: crypto.randomBytes(32).toString('hex')
+        }).save();
 
 
 
 
 
-        const message = `       <h2>Please verify account with this link:</h2> 
+
+        const message = `<h2>Please verify account with this link:</h2> 
         
-        ${process.env.VALIDATE_URL}/verify/${user._id}/${token.token} 
+        <p>${process.env.VALIDATE_URL}/verify/${user._id}/${token.token} </p>
         
-        If you were not expecting this mail, do not press the link! 
+        <strong>If you were not expecting this mail, do not press the link! </strong>
 
-        Have a nice day. //Johan
+        <p>Have a nice day. //Johan
 
-        ps. Please do not reply to this mail.
+        ps. Please do not reply to this mail.<p>
         `;
         const mailSent = await sendEmail(user.email, 'Verify Email!', message);
 
-        if(!mailSent) return res.status(400).send("An error has occured, mail not sent");
+        if (!mailSent) return res.status(400).send("An error has occured, mail not sent");
 
         res.status(200).send("Email verification is sent succesfully, go and verify!");
 
@@ -68,6 +74,7 @@ router.post('/verify', async (req, res) => {
         res.status(400).send(`Error: ${e}`);
     }
 });
+
 
 router.get('/verify/:id/:token', async (req, res) => {
 
@@ -93,20 +100,6 @@ router.get('/verify/:id/:token', async (req, res) => {
 });
 
 
-router.post('/register', async (req, res) => {
-
-
-
-    //Checking if user is already registered
-    const emailExists = await (User.findOne({ email: req.body.email }));
-    if (emailExists) return res.status(400).send('Email already exists');
-
-
-
-
-
-
-});
 
 router.post('/login', async (req, res) => {
 
@@ -120,7 +113,7 @@ router.post('/login', async (req, res) => {
     const user = await (User.findOne({ email: req.body.email }));
     if (!user) return res.status(400).send('Email not found.');
 
-    if(!user.verified) return res.status(400).send('Account is not verified, please request new validation mail.');
+    if (!user.verified) return res.status(400).send('Account is not verified, please request new validation mail.');
 
     //Password is correct
     const validPass = await bcrypt.compare(req.body.password, user.password);
