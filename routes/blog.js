@@ -117,8 +117,11 @@ router.route('/user')
 .get(verify, async (req,res) =>{
     const user = await User.findOne({_id: req.user._id}, {__v:0, password:0, posts:0});
 
-    await user.populate('friends', {password:0, posts:0, friends:0, __v:0} );
+    if(!user) return res.status(400).send('Woah, You seem to not exists bro. Contact me so I can check this up.')
 
+    if(user.friends !== null){
+    await user.populate('friends', {password:0, posts:0, friends:0, __v:0} );
+}
     res.status(200).send(user);
     
 });
