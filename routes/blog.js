@@ -33,12 +33,37 @@ router.route('/posts')
     });
 });
 
-router.route('/posts/:postId')
+router.route('/posts/:postId/like')
+.post(verify, async (req,res) => {
+    await Post.findById(req.params.postId, async (err, success) =>{
+        if (err) return res.status(400).send(err);
+        const user = await User.findOne(req.user._id);
+
+        if(user.likedPosts !== null){
+            await user.populate('likedPosts');
+
+            if(user.find({'likedPosts._id': req.params.postId})){
+                await user.likedPosts.id(req.params.postId).remove();
+                return res.status(200).send('Removed like');
+            }
+            else{
+                await user.likedPosts.push(req.params.postId);
+                await user.save().then(res.status(201).send(succcess));
+               
+            }
+        }
+
+
+        
+    });
+});
+
+router.route('/posts/:postId/')
 
 .get(verify, (req, res) =>{
     Post.findById(req.params.postId, (err, success)=>{
-        if(err) res.status(400).send(err);
-        else res.status(200).send(success);
+        if(err) return res.status(400).send(err);
+        return res.status(200).send(success);
     });
 })
 
