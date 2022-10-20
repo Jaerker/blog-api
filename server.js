@@ -21,10 +21,7 @@ mongoose.connect(process.env.DB_URL,
 //Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: [
-        'https://blog-app-production-a708.up.railway.app',
-        'http://localhost:3000'    
-    ]
+    origin: process.env.CORS_ORIGIN
 }));
 
 
