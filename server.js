@@ -21,7 +21,9 @@ mongoose.connect(process.env.DB_URL,
 //Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: process.env.CORS_ORIGIN
+    origin: [
+        process.env.CORS_ORIGIN,
+        process.env.TEST_ORIGIN    ]
 }));
 
 
