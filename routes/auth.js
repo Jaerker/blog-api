@@ -20,7 +20,7 @@ router.post('/login', async (req, res) => {
     if (error) { return res.status(400).send(error.message) }
 
     //Checking if user is already registered
-    const user = await (User.findOne({ email: req.body.email.toLowerCase() }));
+    let user = await (User.findOne({ email: req.body.email.toLowerCase() }));
     if (!user) return res.status(400).send('Email not found.');
 
     if (!user.verified) return res.status(400).send('Account is not verified, please request new validation mail.');
@@ -29,11 +29,10 @@ router.post('/login', async (req, res) => {
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).send('password is wrong.');
 
-
+    user = await User.findOne({email: req.body.email.toLowerCase()}, {__v:0, password:0})
 
     //Create and assign token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-
 
     res.header('auth-token', token).send({ token, user });
 

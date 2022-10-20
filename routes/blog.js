@@ -35,23 +35,27 @@ router.route('/posts')
 
 router.route('/posts/:postId/like')
 .post(verify, async (req,res) => {
-    await Post.findById(req.params.postId, async (err, success) =>{
+    await User.findById(req.user._id, async (err, success) =>{
         if (err) return res.status(400).send(err);
-        const user = await User.findOne(req.user._id);
 
-        if(user.likedPosts !== null){
-            await user.populate('likedPosts');
-
-            if(user.find({'likedPosts._id': req.params.postId})){
-                await user.likedPosts.id(req.params.postId).remove();
-                return res.status(200).send('Removed like');
-            }
-            else{
-                await user.likedPosts.push(req.params.postId);
-                await user.save().then(res.status(201).send(succcess));
-               
-            }
+        const post = await Post.findById(req.params.postId);
+        if(!post) return res.status(400).send('Post does not exist');
+        
+        if(post.likes.includes(req.user._id)){
+            post.likes.id(req.user._id).deleteOne().then(()=>{
+                return res.status(200).send('Unliked');
+            }).catch(e => {
+                return res.status(400).send(e);
+            });
         }
+        
+        await Post.findOneAndUpdate({_id: req.params.postId}, {$push: {likes : req.user._id}}, {upsert: true, new: true, runValidators: true}, (err, success)=>{
+            if(err) return res.send(400).send(err);
+            return res.status(200).send(user); 
+        });
+        
+
+        
 
 
         
