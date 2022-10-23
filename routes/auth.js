@@ -106,7 +106,7 @@ router.post('/verify', async (req, res) => {
 router.get('/verify/:id/:token', async (req, res) => {
 
     try {
-        const user = await User.findById(req.params.id);
+        let user = await User.findById(req.params.id);
         if (!user) return res.status(400).send('Sorry, invalid link.');
 
         const token = await Token.findOne({
@@ -115,7 +115,7 @@ router.get('/verify/:id/:token', async (req, res) => {
         });
         if (!token) return res.status(400).send('Sorry, invalid link.');
 
-        await User.updateOne({ _id: user._id, verified: true });
+        await User.updateOne({ _id: user._id}, {verified: true });
         await Token.findByIdAndRemove(token._id);
 
         res.status(200).send('You did it, everything went fine!');
