@@ -44,15 +44,15 @@ router.route('/posts/:postId/like')
             const post = await Post.findById(req.params.postId);
             if (!post) return res.status(400).send('Post does not exist');
 
-            if (post.likes.includes(req.user._id)) {
-                post.likes.id(req.user._id).deleteOne().then(() => {
+            if (post.likes.includes(user._id)) {
+                post.likes.id(user._id).deleteOne().then(() => {
                     return res.status(200).send('Unliked');
                 }).catch(e => {
                     return res.status(400).send(e);
                 });
             }
 
-            await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: req.user._id } }, { upsert: true, new: true, runValidators: true }, (err, success) => {
+            await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: user._id } }, { upsert: true, new: true, runValidators: true }, (err, success) => {
                 if (err) return res.send(400).send(err);
                 return res.status(200).send(user);
             });
