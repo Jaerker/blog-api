@@ -243,13 +243,21 @@ router.route('/users/:userId/friends')
     })
 
     .delete(verify, async (req, res) => {
-        const user = await User.findById(req.user._id);
+        
+        await User.findOneAndUpdate({_id: 'req.user._id'}, {$pull: {friends: req.params.userId}}, (err) =>{
+            if(err) return res.status(400).send(`error: ${err}`);
 
-        user.friends.id(req.params.userId).DeleteOne().then(() => {
-            res.status(200).send("Successfully deleted friend.");
-        }).catch(e => {
-            res.status(400).send(e);
+            return res.status(200).send('Succesfully deleted friend');
         });
+
+        
+        // const user = await User.findById(req.user._id);
+
+        // user.friends.id(req.params.userId).DeleteOne().then(() => {
+        //     res.status(200).send("Successfully deleted friend.");
+        // }).catch(e => {
+        //     res.status(400).send(e);
+        // });
     });
 
 

@@ -122,7 +122,7 @@ router.get('/verify/:id/:token', async (req, res) => {
 
 
     } catch (e) {
-        res.status(400).send('Error occured');
+        res.status(400).send(`Error occured: ${e}`);
     }
 });
 
