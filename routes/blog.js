@@ -237,7 +237,7 @@ router.route('/users/:userId/friends')
         }
         else {
             const user = await User.findOneAndUpdate({ _id: req.user._id }, { $push: { friends: friendUser._id } }, { upsert: true, new: true, runValidators: true });
-            res.status(201).send(user);
+            res.status(201).send('Friend added');
         }
 
 
@@ -246,8 +246,12 @@ router.route('/users/:userId/friends')
     .delete(verify, async (req, res) => {
         
         const user = await User.findOneAndUpdate({_id: 'req.user._id'}, {$pull: {friends: req.params.userId}});
-
-         
+        
+        user.save((err)=>{
+            if (err) return res.status(400).send(`error: ${err}`);
+        });
+        
+        return res.send(Success)
 
         
         // const user = await User.findById(req.user._id);
