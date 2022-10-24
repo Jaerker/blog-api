@@ -44,20 +44,21 @@ router.route('/posts/:postId/like')
             const post = await Post.findById(req.params.postId);
             if (!post) return res.status(400).send('Post does not exist');
 
-            if (post.likes.includes(user._id)) {
-                post.likes.id(user._id).deleteOne().then(() => {
-                    return res.status(200).send('Unliked');
-                }).catch(e => {
-                    return res.status(400).send(e);
-                });
-            }
 
-            await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: user._id } }, { upsert: true, new: true, runValidators: true }, (err, success) => {
-                if (err) return res.send(400).send(err);
-                return res.status(200).send(user);
-            });
+            if (post.likes.includes(user._id)) {
+                await Post.findOneAndUpdate({ _id: req.params.postId }, { $pull: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
+            }
+            else{
+                await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
+            }
+            return res.status(200).send('Post like updated');
+
+
         }
-        return res.status(400).send('Did not find User');
+        else{
+            return res.status(400).send('Did not find User');
+        }
+        
 
     });
 
@@ -150,12 +151,12 @@ router.route('/user')
         }
         res.status(200).send(user);
 
-    })    
+    })
     .delete(verify, (req, res) => {
         User.findOneAndDelete({ _id: req.user._id }, (err) => {
             if (err) return res.status(400).send("Could not delete User");
             else {
-                
+
                 return res.status(200).send("Succesfully deleted User" + req.user);
             }
         });
@@ -230,30 +231,29 @@ router.route('/users/:userId/friends')
 
         const friendUser = await User.findById(req.params.userId);
 
-        const alreadyFriend = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id);
 
-        if (alreadyFriend.friends.includes(friendUser._id)) {
-            res.status(400).send("exists");
+        if (user.friends) {
+
+            if (user.friends.includes(friendUser._id)) {
+                return res.status(400).send("exists");
+            }
         }
-        else {
-            const user = await User.findOneAndUpdate({ _id: req.user._id }, { $push: { friends: friendUser._id } }, { upsert: true, new: true, runValidators: true });
-            res.status(201).send('Friend added');
-        }
+
+        await User.findOneAndUpdate({ _id: req.user._id }, { $push: { friends: friendUser._id } }, { upsert: true, new: true, runValidators: true });
+        return res.status(201).send('Friend added');
+
 
 
     })
 
     .delete(verify, async (req, res) => {
-        
-        const user = await User.findOneAndUpdate({_id: 'req.user._id'}, {$pull: {friends: req.params.userId}});
-        
-        user.save((err)=>{
-            if (err) return res.status(400).send(`error: ${err}`);
-        });
-        
-        return res.send(Success)
 
         
+        await User.findOneAndUpdate({ _id: req.user._id }, { $pull: { friends: req.params.userId } }, { upsert: true, new: true, runValidators: true });
+        return res.status(201).send('Friend removed');
+
+
         // const user = await User.findById(req.user._id);
 
         // user.friends.id(req.params.userId).DeleteOne().then(() => {
