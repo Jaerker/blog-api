@@ -150,6 +150,16 @@ router.route('/user')
         }
         res.status(200).send(user);
 
+    })    
+    .delete(verify, (req, res) => {
+        User.findOneAndDelete({ _id: req.user._id }, (err) => {
+            if (err) return res.status(400).send("Could not delete User");
+            else {
+                
+                return res.status(200).send("Succesfully deleted User" + req.user);
+            }
+        });
+
     });
 
 
@@ -185,18 +195,9 @@ router.route('/users/:userId')
             if (err) return res.status(400).send("Did not update user correctly");
             else return res.status(200).send("Succesfully updates user");
         });
-    })
-
-    .delete(verify, (req, res) => {
-        User.findOneAndDelete({ _id: req.user._id }, (err) => {
-            if (err) return res.status(400).send("Could not delete User");
-            else {
-                req.user = null;
-                return res.status(200).send("Succesfully deleted User" + req.user);
-            }
-        });
-
     });
+
+
 
 router.route('/users/:userId/posts')
     .get(verify, async (req, res) => {
@@ -246,7 +247,7 @@ router.route('/users/:userId/friends')
         
         const user = await User.findOneAndUpdate({_id: 'req.user._id'}, {$pull: {friends: req.params.userId}});
 
-        res.send(user);
+         
 
         
         // const user = await User.findById(req.user._id);
