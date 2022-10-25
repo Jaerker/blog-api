@@ -60,12 +60,14 @@ router.post('/verify', async (req, res) => {
 
         }
         else {
+            if (user.verified === true) return res.status(400).send('Email is already registered on this site.');
+            
             const validPass = await bcrypt.compare(req.body.password, user.password);
             if (!validPass) return res.status(400).send('We are waiting for user to verify their account, the mail has been sent!');
         }
 
-        if (user.verified === true) return res.status(400).send('Email is already registered on this site.');
-
+        
+        
 
 
         await Token.findOneAndRemove({ userId: user._id });
