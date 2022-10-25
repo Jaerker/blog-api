@@ -64,11 +64,18 @@ router.route('/posts/:postId/like')
 
 router.route('/posts/:postId/')
 
-    .get(verify, (req, res) => {
-        Post.findById(req.params.postId, (err, success) => {
-            if (err) return res.status(400).send(err);
-            return res.status(200).send(success);
-        });
+    .get(verify, async (req, res) => {
+        
+        const post = await Post.findById(req.params.postId).populate('author');
+
+        if(post) return res.status(200).send(post);
+        return res.status(400).send('did not find post');
+        
+        // Post.findById(req.params.postId, (err, success) => {
+        //     if (err) return res.status(400).send(err);
+        //     return res.status(200).send(success);
+        // });
+    
     })
 
     //Posts comment for specific post.
