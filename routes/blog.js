@@ -19,7 +19,7 @@ router.route('/posts')
 
     })
 
-    .post(verify, (req, res) => {
+    .post(verify, async (req, res) => {
 
 
         const post = new Post({
@@ -27,55 +27,31 @@ router.route('/posts')
             content: req.body.content,
             author: req.user._id
         });
+
+        await User.findOneAndUpdate({ _id: props.user._id }, { $push: { posts: post._id } }, { upsert: true, new: true, runValidators: true });
+
         post.save((err, success) => {
             if (err) return res.status(400).send(err);
             else return res.status(201).send(success);
         });
     });
 
-router.route('/posts/:postId/like')
-    .post(verify, async (req, res) => {
 
-
-        const user = await User.findById(req.user._id);
-
-        if (user) {
-
-            const post = await Post.findById(req.params.postId);
-            if (!post) return res.status(400).send('Post does not exist');
-
-
-            if (post.likes.includes(user._id)) {
-                await Post.findOneAndUpdate({ _id: req.params.postId }, { $pull: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
-            }
-            else{
-                await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
-            }
-            return res.status(200).send('Post like updated');
-
-
-        }
-        else{
-            return res.status(400).send('Did not find User');
-        }
-        
-
-    });
 
 router.route('/posts/:postId/')
 
     .get(verify, async (req, res) => {
-        
-        const post = await Post.findById(req.params.postId).populate('author', {password:0});
 
-        if(post) return res.status(200).send(post);
+        const post = await Post.findById(req.params.postId).populate('author', { password: 0 });
+
+        if (post) return res.status(200).send(post);
         return res.status(400).send('did not find post');
-        
+
         // Post.findById(req.params.postId, (err, success) => {
         //     if (err) return res.status(400).send(err);
         //     return res.status(200).send(success);
         // });
-    
+
     })
 
     //Posts comment for specific post.
@@ -99,11 +75,42 @@ router.route('/posts/:postId/')
     })
 
     //Deletes the post itself with all the comments
-    .delete(verify, (req, res) => {
+    .delete(verify, async (req, res) => {
+        await User.findOneAndUpdate({_id: req.user._id}, {$pull: {posts: req.params.postId}}, { upsert: true, new: true, runValidators: true });
+
         Post.findOneAndDelete({ _id: req.params.postId }, err => {
             if (err) return res.status(400).send(err);
             else return res.status(200).send("Successfully deleted post");
         });
+    });
+
+router.route('/posts/:postId/like')
+    .post(verify, async (req, res) => {
+
+
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+
+            const post = await Post.findById(req.params.postId);
+            if (!post) return res.status(400).send('Post does not exist');
+
+
+            if (post.likes.includes(user._id)) {
+                await Post.findOneAndUpdate({ _id: req.params.postId }, { $pull: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
+            }
+            else {
+                await Post.findOneAndUpdate({ _id: req.params.postId }, { $push: { likes: user._id } }, { upsert: true, new: true, runValidators: true });
+            }
+            return res.status(200).send('Post like updated');
+
+
+        }
+        else {
+            return res.status(400).send('Did not find User');
+        }
+
+
     });
 
 
@@ -160,6 +167,7 @@ router.route('/user')
 
     })
     .delete(verify, (req, res) => {
+        
         User.findOneAndDelete({ _id: req.user._id }, (err) => {
             if (err) return res.status(400).send("Could not delete User");
             else {
@@ -224,11 +232,11 @@ router.route('/users/:userId/friends')
 
     .get(verify, async (req, res) => {
 
-        const user = await User.findOne({ _id: req.params.userId }).populate('friends').exec();
+        const user = await User.findOne({ _id: req.params.userId }).populate('friends', {password:0}).exec();
 
-        user.friends.forEach(e => {
-            e.password = "";
-        });
+        // user.friends.forEach(e => {
+        //     e.password = "";
+        // });
 
         res.send(user.friends);
 
@@ -256,7 +264,7 @@ router.route('/users/:userId/friends')
 
     .delete(verify, async (req, res) => {
 
-        
+
         await User.findOneAndUpdate({ _id: req.user._id }, { $pull: { friends: req.params.userId } }, { upsert: true, new: true, runValidators: true });
         return res.status(201).send('Friend removed');
 
