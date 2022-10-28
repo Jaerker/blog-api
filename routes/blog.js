@@ -28,7 +28,7 @@ router.route('/posts')
             author: req.user._id
         });
 
-        await User.findOneAndUpdate({ _id: props.user._id }, { $push: { posts: post._id } }, { upsert: true, new: true, runValidators: true });
+        await User.findOneAndUpdate({ _id: req.user._id }, { $push: { posts: post._id } }, { upsert: true, new: true, runValidators: true });
 
         post.save((err, success) => {
             if (err) return res.status(400).send(err);
