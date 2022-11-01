@@ -60,7 +60,8 @@ router.route('/posts/:postId/')
         const comment = new Comment({
             reaction: req.body.reaction,
             content: req.body.content,
-            user: req.user._id
+            user: req.user._id,
+            username: req.user.username
 
         });
 
