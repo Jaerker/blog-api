@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    username: {
+        type: String,
+        required: true
+    },
+    
     email: {
         type: String,
         required: true,
@@ -39,6 +44,10 @@ const userSchema = new mongoose.Schema({
     }],
 
     verified: {
+        type: Boolean,
+        default: false
+    },
+    adminRole: {
         type: Boolean,
         default: false
     }

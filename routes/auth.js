@@ -55,7 +55,8 @@ router.post('/verify', async (req, res) => {
                 fName: req.body.fName,
                 lName: req.body.lName,
                 email: req.body.email.toLowerCase(),
-                password: hashPassword
+                password: hashPassword,
+                username: req.body.username
             }).save();
 
         }
