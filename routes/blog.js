@@ -60,7 +60,7 @@ router.route('/posts/:postId/')
     //Posts comment for specific post.
     .post(verify, async (req, res) => {
 
-        const user = await User.findByid(req.user._id);
+        const user = await User.findById(req.user._id);
 
 
         const Comment = new mongoose.model("comment", commentSchema);
