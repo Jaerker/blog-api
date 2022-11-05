@@ -10,7 +10,7 @@ router.route('/posts')
     .get(verify, async (req, res) => {
 
 
-        const posts = await Post.find();
+        const posts = await Post.find().populate('author', {password:0});
 
         if (posts) return res.status(200).send(posts);
         else return res.status(400).send("No posts found.");
@@ -42,7 +42,6 @@ router.route('/posts/:postId/')
 
     .get(verify, async (req, res) => {
 
-        console.log(req.user);
 
         const post = await Post.findById(req.params.postId).populate('author', { password: 0 });
 
