@@ -130,6 +130,16 @@ router.get('/verify/:id/:token', async (req, res) => {
 });
 
 
+router.get('/test', async (req, res) => {
+
+    const post = await Post.findById('635bbfb067d19ff6a1b609e6');
+
+        if (posts) return res.status(200).send(post);
+        else return res.status(400).send("No posts found.");
+    
+    res.status(200).send('Test verified')
+});
+
 
 
 
