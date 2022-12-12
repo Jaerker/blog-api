@@ -9,6 +9,7 @@ const { registerValidation, loginValidation } = require('../validation');
 
 const User = require('../model/User');
 const Token = require('../model/TokenSchema');
+const { Post } = require('../model/Post');
 
 
 router.post('/login', async (req, res) => {
@@ -29,7 +30,7 @@ router.post('/login', async (req, res) => {
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).send('password is wrong.');
 
-    user = await User.findOne({email: req.body.email.toLowerCase()}, {__v:0, password:0})
+    user = await User.findOne({ email: req.body.email.toLowerCase() }, { __v: 0, password: 0 })
 
     //Create and assign token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
@@ -62,13 +63,13 @@ router.post('/verify', async (req, res) => {
         }
         else {
             if (user.verified === true) return res.status(400).send('Email is already registered on this site.');
-            
+
             const validPass = await bcrypt.compare(req.body.password, user.password);
             if (!validPass) return res.status(400).send('We are waiting for user to verify their account, the mail has been sent!');
         }
 
-        
-        
+
+
 
 
         await Token.findOneAndRemove({ userId: user._id });
@@ -118,7 +119,7 @@ router.get('/verify/:id/:token', async (req, res) => {
         });
         if (!token) return res.status(400).send('Sorry, invalid link.');
 
-        await User.updateOne({ _id: user._id}, {verified: true });
+        await User.updateOne({ _id: user._id }, { verified: true });
         await Token.findByIdAndRemove(token._id);
 
         res.status(200).send('You did it, everything went fine!');
@@ -134,10 +135,9 @@ router.get('/test', async (req, res) => {
 
     const post = await Post.findById('635bbfb067d19ff6a1b609e6');
 
-        if (posts) return res.status(200).send(post);
-        else return res.status(400).send("No posts found.");
-    
-    res.status(200).send('Test verified')
+    if (posts) return res.status(200).send(post);
+    else return res.status(400).send("No posts found.");
+
 });
 
 
