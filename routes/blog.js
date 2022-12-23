@@ -7,7 +7,7 @@ const User = require('../model/User');
 
 
 router.route('/posts')
-    .get(verify, async (req, res) => {
+    .get(async (req, res) => {
 
 
         const posts = await Post.find().populate('author', {password:0});
