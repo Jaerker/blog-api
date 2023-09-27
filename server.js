@@ -8,7 +8,7 @@ const authRoute = require('./routes/auth');
 const blogRoute = require('./routes/blog');
 
 
-const PORT = process.env.PORT;
+const PORT = 3033 || process.env.PORT;
 
 
 //Connect to db
@@ -23,7 +23,6 @@ app.use(express.json());
 app.use(cors({
     origin: [process.env.CORS_ORIGIN, process.env.TEST_ORIGIN],
     methods: 'GET,PUT,POST,DELETE',
-    allowedHeaders: 'Content-Type',
 
 }));
 
